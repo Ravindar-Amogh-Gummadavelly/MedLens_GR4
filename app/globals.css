@@ -4,12 +4,12 @@
 
 @layer base {
   html {
-    @apply text-text-primary antialiased;
+    @apply text-slate-900 antialiased;
     font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   }
 
   body {
-    @apply bg-clinical-bg text-text-primary font-sans min-h-screen selection:bg-primary-100 selection:text-primary-900 transition-colors duration-200;
+    @apply bg-slate-50 text-slate-900 font-sans min-h-screen selection:bg-primary-100 selection:text-primary-900 transition-colors duration-200;
   }
 
   html.dark body {
@@ -18,65 +18,65 @@
 }
 
 @layer components {
-  /* Status badges — always use text + icon, never color alone */
+  /* Status badges — high contrast for readability */
   .status-badge {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold leading-tight;
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold leading-tight;
   }
   .status-badge-low {
-    @apply status-badge bg-status-low-bg text-status-low border border-status-low-border dark:bg-blue-950/80 dark:text-blue-400 dark:border-blue-800;
+    @apply status-badge bg-blue-100 text-blue-900 border border-blue-300 dark:bg-blue-950/90 dark:text-blue-300 dark:border-blue-700;
   }
   .status-badge-normal {
-    @apply status-badge bg-status-normal-bg text-status-normal border border-status-normal-border dark:bg-emerald-950/80 dark:text-emerald-400 dark:border-emerald-800;
+    @apply status-badge bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-950/90 dark:text-emerald-300 dark:border-emerald-700;
   }
   .status-badge-high {
-    @apply status-badge bg-status-high-bg text-status-high border border-status-high-border dark:bg-rose-950/80 dark:text-rose-400 dark:border-rose-800;
+    @apply status-badge bg-rose-100 text-rose-900 border border-rose-300 dark:bg-rose-950/90 dark:text-rose-300 dark:border-rose-700;
   }
   .status-badge-unknown {
-    @apply status-badge bg-status-unknown-bg text-status-unknown border border-status-unknown-border dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700;
+    @apply status-badge bg-slate-200 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700;
   }
 
   /* Provenance origin badges */
   .origin-badge {
-    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-2xs font-medium border;
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded text-2xs font-semibold border;
   }
   .origin-ai-extracted {
-    @apply origin-badge bg-primary-50 text-primary-700 border-primary-200 dark:bg-indigo-950/80 dark:text-primary-300 dark:border-primary-800;
+    @apply origin-badge bg-indigo-50 text-indigo-900 border-indigo-200 dark:bg-indigo-950/90 dark:text-indigo-200 dark:border-indigo-700;
   }
   .origin-human-verified {
-    @apply origin-badge bg-verified-bg text-verified-text border-verified-border dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800;
+    @apply origin-badge bg-emerald-50 text-emerald-900 border-emerald-200 dark:bg-emerald-950/90 dark:text-emerald-200 dark:border-emerald-700;
   }
   .origin-user-provided {
-    @apply origin-badge bg-gray-50 text-gray-600 border-gray-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700;
+    @apply origin-badge bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700;
   }
 
   /* Verification status pills */
   .verification-needs-review {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-review-bg text-review-text border border-review-border dark:bg-amber-950/80 dark:text-amber-300 dark:border-amber-800;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-2xs font-bold bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950/90 dark:text-amber-300 dark:border-amber-700;
   }
   .verification-verified {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-verified-bg text-verified-text border border-verified-border dark:bg-emerald-950/80 dark:text-emerald-300 dark:border-emerald-800;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-2xs font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-950/90 dark:text-emerald-300 dark:border-emerald-700;
   }
   .verification-rejected {
-    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-rejected-bg text-rejected-text border border-rejected-border dark:bg-rose-950/80 dark:text-rose-300 dark:border-rose-800;
+    @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-2xs font-bold bg-rose-100 text-rose-900 border border-rose-300 dark:bg-rose-950/90 dark:text-rose-300 dark:border-rose-700;
   }
 
-  /* Card component */
+  /* Card component — adapt dynamically between light and dark modes */
   .card {
-    @apply bg-clinical-surface border border-clinical-border rounded-xl shadow-card dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100 transition-colors duration-200;
+    @apply bg-white border border-slate-200 text-slate-900 rounded-xl shadow-sm dark:bg-slate-900 dark:border-slate-800 dark:text-slate-100 transition-colors duration-200;
   }
   .card-hover {
-    @apply card hover:shadow-card-hover hover:border-clinical-border-strong dark:hover:border-slate-700 transition-all duration-150;
+    @apply card hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-150;
   }
 
   /* Clinical data value display */
   .data-value {
-    @apply text-xl font-bold text-text-primary dark:text-slate-100 tracking-tight;
+    @apply text-xl font-bold text-slate-900 dark:text-white tracking-tight;
   }
   .data-unit {
-    @apply text-xs font-medium text-text-tertiary dark:text-slate-400 ml-1;
+    @apply text-xs font-medium text-slate-600 dark:text-slate-400 ml-1;
   }
   .data-label {
-    @apply text-xs font-medium text-text-tertiary dark:text-slate-400 uppercase tracking-wider;
+    @apply text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider;
   }
 
   /* Source highlight for traceability */

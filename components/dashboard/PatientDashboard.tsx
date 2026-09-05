@@ -119,24 +119,72 @@ export default function PatientDashboard({
         </Link>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-4 gap-4">
-        {SUMMARY_CARDS.map((card) => (
-          <div key={card.label} className="card p-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="data-label">{card.label}</span>
+      {/* Patient Overview + Attention Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Patient Profile Card (3 cols) */}
+        <div className="col-span-12 lg:col-span-4 bg-primary-600 dark:bg-primary-950/90 border border-primary-500/30 rounded-2xl p-5 text-white space-y-4 shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white/20 text-white font-bold text-lg flex items-center justify-center backdrop-blur-md">
+              {pName.charAt(0)}
             </div>
-            <div className="data-value">{card.value}</div>
-            <span className={`text-xs font-medium mt-1 inline-block ${
-              card.accent === 'high' ? 'text-status-high' :
-              card.accent === 'warning' ? 'text-status-warning' :
-              card.accent === 'normal' ? 'text-status-normal' :
-              'text-text-tertiary'
-            }`}>
-              {card.delta}
-            </span>
+            <div>
+              <h2 className="text-lg font-bold tracking-tight">{pName}</h2>
+              <p className="text-2xs text-primary-200 font-mono">MR-{pId}</p>
+              <div className="flex items-center gap-2 text-2xs text-primary-100 mt-0.5">
+                <span>34 Years</span>
+                <span>•</span>
+                <span>Male</span>
+              </div>
+            </div>
           </div>
-        ))}
+
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            <span className="px-2 py-0.5 rounded text-2xs font-semibold bg-white/10 text-white border border-white/20">Hypertension</span>
+            <span className="px-2 py-0.5 rounded text-2xs font-semibold bg-rose-500/20 text-rose-200 border border-rose-400/30">Penicillin Allergy</span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
+            <div className="bg-black/20 p-2 rounded-xl">
+              <span className="text-2xs text-primary-200 block">Reports</span>
+              <span className="text-base font-bold">8</span>
+            </div>
+            <div className="bg-black/20 p-2 rounded-xl">
+              <span className="text-2xs text-primary-200 block">Lab Results</span>
+              <span className="text-base font-bold">42</span>
+            </div>
+            <div className="bg-rose-500/30 border border-rose-400/30 p-2 rounded-xl">
+              <span className="text-2xs text-rose-200 block">To Review</span>
+              <span className="text-base font-bold text-rose-200">3</span>
+            </div>
+          </div>
+        </div>
+
+        {/* What Needs Your Attention Cards (8 cols) */}
+        <div className="col-span-12 lg:col-span-8 grid grid-cols-3 gap-4">
+          <div className="card p-4 border-l-4 border-l-amber-500 flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-amber-500">
+              <span>⚠️ Low Confidence</span>
+            </div>
+            <div className="text-3xl font-extrabold text-text-primary dark:text-white my-2">2</div>
+            <span className="text-2xs text-text-tertiary dark:text-slate-400">Items needing review</span>
+          </div>
+
+          <div className="card p-4 border-l-4 border-l-rose-500 flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-rose-500">
+              <span>⚠️ Conflicts Detected</span>
+            </div>
+            <div className="text-3xl font-extrabold text-text-primary dark:text-white my-2">1</div>
+            <span className="text-2xs text-text-tertiary dark:text-slate-400">Needs clinician review</span>
+          </div>
+
+          <div className="card p-4 border-l-4 border-l-blue-500 flex flex-col justify-between">
+            <div className="flex items-center gap-2 text-xs font-semibold text-blue-500">
+              <span>⚠️ Unverified Results</span>
+            </div>
+            <div className="text-3xl font-extrabold text-text-primary dark:text-white my-2">3</div>
+            <span className="text-2xs text-text-tertiary dark:text-slate-400">Pending human verification</span>
+          </div>
+        </div>
       </div>
 
       {/* Factual Summary Card if available */}
