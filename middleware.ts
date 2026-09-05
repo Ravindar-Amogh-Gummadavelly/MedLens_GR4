@@ -5,10 +5,10 @@ export function middleware(request: NextRequest) {
   const token = request.cookies.get('medlens_session')?.value;
   const { pathname } = request.nextUrl;
 
-  // Public paths
+  // Skip middleware for api, login, _next, and assets
   if (
     pathname === '/login' ||
-    pathname.startsWith('/api/auth') ||
+    pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.includes('.')
   ) {
@@ -18,7 +18,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Protected paths
+  // Protect all app pages
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
@@ -27,5 +27,14 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };
