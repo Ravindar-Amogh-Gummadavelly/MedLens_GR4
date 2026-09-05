@@ -38,13 +38,22 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3 pl-3 border-l border-slate-800">
-          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-medium text-xs">
-            EV
+          <div className="w-8 h-8 rounded-full bg-clinical-navy/80 border border-slate-700 flex items-center justify-center text-white font-bold text-xs">
+            SJ
           </div>
           <div className="text-left hidden sm:block">
-            <div className="text-xs font-semibold text-white">Eleanor Vance</div>
-            <div className="text-[10px] text-slate-400">Patient ID: #PAT-8842</div>
+            <div className="text-xs font-semibold text-white">Dr. Sarah Jenkins</div>
+            <div className="text-[10px] text-slate-400">Clinician Workspace</div>
           </div>
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }}
+            className="ml-2 px-2.5 py-1 text-xs font-semibold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     </header>

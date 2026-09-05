@@ -25,83 +25,7 @@ interface VerificationCenterProps {
 }
 
 /* ── Demo Data ─────────────────────────────────────────────────── */
-const DEFAULT_REVIEW_ITEMS: VerificationReviewItem[] = [
-  {
-    id: '1',
-    testName: 'Hemoglobin',
-    category: 'Hematology',
-    valueText: '11.2',
-    unit: 'g/dL',
-    rawReferenceRange: '13.0–17.0 g/dL',
-    deterministicStatus: 'LOW',
-    origin: 'AI Extracted',
-    confidence: 92,
-    verificationStatus: 'NEEDS_REVIEW',
-    sourceText: 'Hemoglobin: 11.2 g/dL',
-    documentName: 'CBC_Report_Sep2025.pdf',
-    testDate: '2025-09-01',
-  },
-  {
-    id: '2',
-    testName: 'Fasting Glucose',
-    category: 'Metabolic',
-    valueText: '142',
-    unit: 'mg/dL',
-    rawReferenceRange: '70–100 mg/dL',
-    deterministicStatus: 'HIGH',
-    origin: 'AI Extracted',
-    confidence: 97,
-    verificationStatus: 'NEEDS_REVIEW',
-    sourceText: 'Glucose (Fasting): 142 mg/dL',
-    documentName: 'CBC_Report_Sep2025.pdf',
-    testDate: '2025-09-01',
-  },
-  {
-    id: '3',
-    testName: 'Platelet Count',
-    category: 'Hematology',
-    valueText: '245,000',
-    unit: '/µL',
-    rawReferenceRange: '150,000–400,000 /µL',
-    deterministicStatus: 'NORMAL',
-    origin: 'AI Extracted',
-    confidence: 88,
-    verificationStatus: 'NEEDS_REVIEW',
-    sourceText: 'Platelets: 245,000 /µL',
-    documentName: 'CBC_Report_Sep2025.pdf',
-    testDate: '2025-09-01',
-  },
-  {
-    id: '4',
-    testName: 'Total Cholesterol',
-    category: 'Lipid',
-    valueText: '210',
-    unit: 'mg/dL',
-    rawReferenceRange: '<200 mg/dL',
-    deterministicStatus: 'HIGH',
-    origin: 'AI Extracted',
-    confidence: 95,
-    verificationStatus: 'NEEDS_REVIEW',
-    sourceText: 'Total Cholesterol: 210 mg/dL',
-    documentName: 'Lipid_Profile_Aug2025.pdf',
-    testDate: '2025-08-25',
-  },
-  {
-    id: '5',
-    testName: 'LDL Cholesterol',
-    category: 'Lipid',
-    valueText: '135',
-    unit: 'mg/dL',
-    rawReferenceRange: '<100 mg/dL',
-    deterministicStatus: 'HIGH',
-    origin: 'AI Extracted',
-    confidence: 72,
-    verificationStatus: 'NEEDS_REVIEW',
-    sourceText: 'LDL-C: 135 mg/dL',
-    documentName: 'Lipid_Profile_Aug2025.pdf',
-    testDate: '2025-08-25',
-  },
-];
+const DEFAULT_REVIEW_ITEMS: VerificationReviewItem[] = [];
 
 type Filter = 'all' | 'high' | 'medium' | 'low';
 
@@ -110,7 +34,7 @@ export default function VerificationCenter({
   onVerify,
   onReject,
 }: VerificationCenterProps) {
-  const items = reviewItems && reviewItems.length > 0 ? reviewItems : DEFAULT_REVIEW_ITEMS;
+  const items = reviewItems || [];
 
   const [filter, setFilter] = useState<Filter>('all');
   const [reviewed, setReviewed] = useState<Set<string>>(new Set());
@@ -147,19 +71,39 @@ export default function VerificationCenter({
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Verification Progress</span>
-          <span className="text-sm font-bold text-text-primary">{Math.round((reviewed.size / items.length) * 100)}%</span>
+      {items.length === 0 ? (
+        <div className="card p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl">
+            ✓
+          </div>
+          <h3 className="text-lg font-bold text-text-primary">No Pending Verification Items</h3>
+          <p className="text-sm text-text-secondary max-w-md mx-auto">
+            All extracted laboratory values have been reviewed or no documents are currently queued for verification.
+          </p>
+          <a
+            href="/reports/upload"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            Upload Medical Document
+          </a>
         </div>
-        <div className="w-full h-2.5 bg-clinical-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-status-normal rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${(reviewed.size / items.length) * 100}%` }}
-          />
-        </div>
-      </div>
+      ) : (
+        <>
+          {/* Progress bar */}
+          <div className="card p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Verification Progress</span>
+              <span className="text-sm font-bold text-text-primary">{items.length ? Math.round((reviewed.size / items.length) * 100) : 100}%</span>
+            </div>
+            <div className="w-full h-2.5 bg-clinical-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-status-normal rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${items.length ? (reviewed.size / items.length) * 100 : 100}%` }}
+              />
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Review cards */}
       <div className="space-y-3">
