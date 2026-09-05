@@ -1,0 +1,187 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  role          String         @default("PATIENT")
+  patients      Patient[]
+  verifications Verification[]
+  auditEvents   AuditEvent[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Patient {
+  id                 String            @id @default(uuid())
+  userId             String
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String
+  dob                String?
+  sex                String?
+  symptoms           String?
+  existingConditions String?
+  allergies          String?
+  medications        String?
+  documents          MedicalDocument[]
+  labResults         LabResult[]
+  prescriptions      Prescription[]
+  timelineEvents     TimelineEvent[]
+  conflicts          Conflict[]
+  summaries          Summary[]
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+}
+
+model MedicalDocument {
+  id             String          @id @default(uuid())
+  patientId      String
+  patient        Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  filename       String
+  originalName   String
+  fileUrl        String
+  mimeType       String
+  fileSize       Int
+  status         String          @default("UPLOADED") // UPLOADING, UPLOADED, OCR_PROCESSING, EXTRACTION_PROCESSING, VALIDATING, READY_FOR_REVIEW, VERIFIED, FAILED
+  rawOcrText     String?
+  pageCount      Int             @default(1)
+  extractionJobs ExtractionJob[]
+  labResults     LabResult[]
+  prescriptions  Prescription[]
+  timelineEvents TimelineEvent[]
+  summaries      Summary[]
+  uploadedAt     DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model ExtractionJob {
+  id          String          @id @default(uuid())
+  documentId  String
+  document    MedicalDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  status      String          @default("PENDING")
+  error       String?
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+}
+
+model LabResult {
+  id                  String         @id @default(uuid())
+  patientId           String
+  patient             Patient        @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  documentId          String
+  document            MedicalDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  testName            String
+  category            String?
+  valueNum            Float?
+  valueText           String
+  unit                String?
+  lowerBound          Float?
+  upperBound          Float?
+  rawReferenceRange   String?
+  deterministicStatus String         @default("UNABLE_TO_DETERMINE") // LOW, NORMAL, HIGH, UNABLE_TO_DETERMINE
+  origin              String         @default("AI_EXTRACTED") // USER_PROVIDED, AI_EXTRACTED, AI_GENERATED, HUMAN_VERIFIED
+  confidence          Float          @default(100.0)
+  verificationStatus  String         @default("NEEDS_REVIEW") // NEEDS_REVIEW, VERIFIED, REJECTED
+  sourcePage          Int            @default(1)
+  sourceText          String?
+  humanNote           String?
+  verifications       Verification[]
+  testDate            String?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+}
+
+model Prescription {
+  id                 String          @id @default(uuid())
+  patientId          String
+  patient            Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  documentId         String?
+  document           MedicalDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  medicationName     String
+  dosage             String?
+  frequency          String?
+  route              String?
+  duration           String?
+  prescribingDoctor  String?
+  origin             String          @default("AI_EXTRACTED")
+  verificationStatus String          @default("NEEDS_REVIEW")
+  verifications      Verification[]
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+}
+
+model TimelineEvent {
+  id          String           @id @default(uuid())
+  patientId   String
+  patient     Patient          @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  documentId  String?
+  document    MedicalDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  eventType   String           // RECORD_CREATED, DOCUMENT_UPLOADED, LAB_REPORT_PROCESSED, VERIFICATION_ACTION, CONFLICT_DETECTED
+  title       String
+  description String
+  eventDate   DateTime         @default(now())
+  metadata    String?
+  createdAt   DateTime         @default(now())
+}
+
+model Verification {
+  id               String        @id @default(uuid())
+  labResultId      String?
+  labResult        LabResult?    @relation(fields: [labResultId], references: [id], onDelete: Cascade)
+  prescriptionId   String?
+  prescription     Prescription? @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  verifiedByUserId String
+  verifiedByUser   User          @relation(fields: [verifiedByUserId], references: [id], onDelete: Cascade)
+  originalValue    String
+  correctedValue   String
+  action           String        // VERIFIED, EDITED, REJECTED
+  reason           String?
+  createdAt        DateTime      @default(now())
+}
+
+model Conflict {
+  id              String   @id @default(uuid())
+  patientId       String
+  patient         Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  category        String   // DEMOGRAPHIC, LAB_VALUE, ALLERGY, MEDICATION
+  title           String
+  description     String
+  sourceA         String
+  sourceB         String
+  status          String   @default("UNRESOLVED") // UNRESOLVED, RESOLVED
+  resolvedByUserId String?
+  resolution      String?
+  createdAt       DateTime @default(now())
+}
+
+model Summary {
+  id           String          @id @default(uuid())
+  patientId    String
+  patient      Patient         @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  documentId   String?
+  document     MedicalDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  summaryText  String
+  keyTakeaways String
+  factualPoints String
+  safeNotes    String?
+  createdAt    DateTime        @default(now())
+}
+
+model AuditEvent {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action     String
+  targetType String
+  targetId   String
+  details    String?
+  createdAt  DateTime @default(now())
+}

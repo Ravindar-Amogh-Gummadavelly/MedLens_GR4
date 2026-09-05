@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply text-text-primary antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  body {
+    @apply bg-clinical-bg font-sans min-h-screen selection:bg-primary-100 selection:text-primary-900;
+  }
+}
+
+@layer components {
+  /* Status badges — always use text + icon, never color alone */
+  .status-badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-semibold leading-tight;
+  }
+  .status-badge-low {
+    @apply status-badge bg-status-low-bg text-status-low border border-status-low-border;
+  }
+  .status-badge-normal {
+    @apply status-badge bg-status-normal-bg text-status-normal border border-status-normal-border;
+  }
+  .status-badge-high {
+    @apply status-badge bg-status-high-bg text-status-high border border-status-high-border;
+  }
+  .status-badge-unknown {
+    @apply status-badge bg-status-unknown-bg text-status-unknown border border-status-unknown-border;
+  }
+
+  /* Provenance origin badges */
+  .origin-badge {
+    @apply inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-2xs font-medium border;
+  }
+  .origin-ai-extracted {
+    @apply origin-badge bg-primary-50 text-primary-700 border-primary-200;
+  }
+  .origin-human-verified {
+    @apply origin-badge bg-verified-bg text-verified-text border-verified-border;
+  }
+  .origin-user-provided {
+    @apply origin-badge bg-gray-50 text-gray-600 border-gray-200;
+  }
+
+  /* Verification status pills */
+  .verification-needs-review {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-review-bg text-review-text border border-review-border;
+  }
+  .verification-verified {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-verified-bg text-verified-text border border-verified-border;
+  }
+  .verification-rejected {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-2xs font-semibold bg-rejected-bg text-rejected-text border border-rejected-border;
+  }
+
+  /* Card component */
+  .card {
+    @apply bg-clinical-surface border border-clinical-border rounded-xl shadow-card;
+  }
+  .card-hover {
+    @apply card hover:shadow-card-hover hover:border-clinical-border-strong transition-all duration-150;
+  }
+
+  /* Clinical data value display */
+  .data-value {
+    @apply text-xl font-bold text-text-primary tracking-tight;
+  }
+  .data-unit {
+    @apply text-xs font-medium text-text-tertiary ml-1;
+  }
+  .data-label {
+    @apply text-xs font-medium text-text-tertiary uppercase tracking-wider;
+  }
+
+  /* Source highlight for traceability */
+  .source-highlight {
+    @apply bg-amber-100 border-l-[3px] border-amber-400 rounded-r px-1;
+  }
+}
+
+/* Print styles for Doctor-Ready PDF */
+@media print {
+  .print\\:hidden { display: none !important; }
+  body { background: white !important; }
+}
