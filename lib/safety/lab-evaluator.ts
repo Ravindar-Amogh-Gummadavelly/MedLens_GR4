@@ -11,6 +11,8 @@ export interface LabValueInput {
 export interface LabEvaluationResult {
   status: LabStatus;
   reason: string;
+  isCritical?: boolean;
+  criticalReason?: string;
 }
 
 /**

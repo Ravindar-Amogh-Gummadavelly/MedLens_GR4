@@ -37,6 +37,7 @@ export default function VerificationCenter({
   const items = reviewItems || [];
 
   const [filter, setFilter] = useState<Filter>('all');
+  const [showConflictOnly, setShowConflictOnly] = useState(false);
   const [reviewed, setReviewed] = useState<Set<string>>(new Set());
 
   const pendingCount = items.length - reviewed.size;
@@ -56,17 +57,25 @@ export default function VerificationCenter({
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Human Review Center</h1>
-          <p className="text-sm text-text-secondary mt-1">
-            AI-extracted values awaiting human verification. Review, correct, or reject each field.
+          <h1 className="text-2xl font-bold text-text-primary dark:text-white tracking-tight">Human Review & AI Conflict Resolution Hub</h1>
+          <p className="text-sm text-text-secondary dark:text-slate-400 mt-1">
+            Resolve extraction conflicts and human-verify lab parameters extracted across multiple diagnostic reports.
           </p>
         </div>
+
         <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-text-secondary">
-            <span className="text-xl font-bold text-text-primary">{pendingCount}</span> pending
-          </span>
-          <span className="text-sm font-medium text-status-normal">
-            <span className="text-xl font-bold">{reviewed.size}</span> verified
+          <button
+            onClick={() => setShowConflictOnly(!showConflictOnly)}
+            className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all ${
+              showConflictOnly
+                ? 'bg-rose-600 text-white border-rose-500 shadow-sm'
+                : 'bg-clinical-surface dark:bg-slate-800 text-text-secondary dark:text-slate-300 border-clinical-border dark:border-slate-700'
+            }`}
+          >
+            🛡️ {showConflictOnly ? 'Showing Conflicting Values Only' : 'Show All Tasks'}
+          </button>
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-clinical-muted dark:bg-slate-800 text-text-primary dark:text-white">
+            {pendingCount} Pending
           </span>
         </div>
       </div>

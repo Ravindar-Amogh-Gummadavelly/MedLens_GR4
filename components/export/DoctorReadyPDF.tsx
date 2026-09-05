@@ -54,6 +54,56 @@ export default function DoctorReadyPDF({
     window.print();
   };
 
+  const handleExportFHIR = () => {
+    const fhirResource = {
+      resourceType: 'Bundle',
+      type: 'collection',
+      timestamp: new Date().toISOString(),
+      entry: [
+        {
+          resource: {
+            resourceType: 'Patient',
+            id: patient.id || 'PAT-001',
+            name: [{ text: patient.name }],
+            gender: patient.sex?.toLowerCase() === 'female' ? 'female' : 'male',
+            birthDate: patient.dob || '1980-05-14',
+          },
+        },
+        ...labResults.map((r, i) => ({
+          resource: {
+            resourceType: 'Observation',
+            id: `obs-${i + 1}`,
+            status: 'final',
+            code: { text: r.testName },
+            valueQuantity: {
+              value: parseFloat(r.valueText) || r.valueText,
+              unit: r.unit,
+            },
+            interpretation: [
+              {
+                coding: [
+                  {
+                    system: 'http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation',
+                    code: r.deterministicStatus,
+                  },
+                ],
+              },
+            ],
+            referenceRange: [{ text: r.rawReferenceRange }],
+          },
+        })),
+      ],
+    };
+
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(fhirResource, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `FHIR_PatientRecord_${patient.name.replace(/\s+/g, '_')}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Top Action Bar */}
@@ -61,20 +111,34 @@ export default function DoctorReadyPDF({
         <div>
           <h2 className="text-base font-bold text-text-primary">Doctor-Ready Clinical Summary</h2>
           <p className="text-xs text-text-secondary mt-0.5">
-            Export structured patient record formatted for clinical consultation with verified lab provenance.
+            Export structured patient record formatted for clinical consultation or EHR systems (FHIR R4 / HL7).
           </p>
         </div>
-        <button
-          onClick={handlePrint}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-xs font-semibold rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
-        >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="6 9 6 2 18 2 18 9" />
-            <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
-            <rect x="6" y="14" width="12" height="8" />
-          </svg>
-          Print / Save PDF
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleExportFHIR}
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-800 dark:bg-slate-700 text-white text-xs font-semibold rounded-lg hover:bg-slate-700 transition-colors shadow-sm"
+          >
+            <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="16" y1="13" x2="8" y2="13" />
+              <line x1="16" y1="17" x2="8" y2="17" />
+            </svg>
+            Export FHIR R4 (JSON)
+          </button>
+          <button
+            onClick={handlePrint}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-xs font-semibold rounded-lg hover:bg-primary-700 transition-colors shadow-sm"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="6 9 6 2 18 2 18 9" />
+              <path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2" />
+              <rect x="6" y="14" width="12" height="8" />
+            </svg>
+            Print / Save PDF
+          </button>
+        </div>
       </div>
 
       {/* Printable Clinical Sheet */}
