@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import SplitTraceabilityView from '@/components/provenance/SplitTraceabilityView';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: { reportId: string };

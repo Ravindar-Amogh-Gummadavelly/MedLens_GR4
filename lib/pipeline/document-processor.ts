@@ -43,17 +43,17 @@ export async function runDocumentProcessingPipeline(documentId: string, fileBuff
       data: { status: 'VALIDATING' },
     });
 
-    const labResultPromises = extractedData.lab_results.map((lab) => {
-      const evaluation = evaluateLabStatus({
-        valueNum: lab.value_num,
-        valueText: lab.value_text,
-        lowerBound: lab.lower_bound,
-        upperBound: lab.upper_bound,
-        rawReferenceRange: lab.raw_reference_range,
-      });
+    if (extractedData.lab_results && extractedData.lab_results.length > 0) {
+      const labResultsData = extractedData.lab_results.map((lab) => {
+        const evaluation = evaluateLabStatus({
+          valueNum: lab.value_num,
+          valueText: lab.value_text,
+          lowerBound: lab.lower_bound,
+          upperBound: lab.upper_bound,
+          rawReferenceRange: lab.raw_reference_range,
+        });
 
-      return prisma.labResult.create({
-        data: {
+        return {
           patientId: doc.patientId,
           documentId: doc.id,
           testName: lab.test_name,
@@ -71,49 +71,43 @@ export async function runDocumentProcessingPipeline(documentId: string, fileBuff
           sourcePage: lab.source_page || 1,
           sourceText: lab.source_text || null,
           testDate: extractedData.report_date || doc.uploadedAt.toISOString().split('T')[0],
-        },
+        };
       });
-    });
 
-    await Promise.all(labResultPromises);
+      await prisma.labResult.createMany({ data: labResultsData });
+    }
 
     // Phase 5: Prescriptions Extraction (if any)
     if (extractedData.prescriptions && extractedData.prescriptions.length > 0) {
-      const rxPromises = extractedData.prescriptions.map((rx) =>
-        prisma.prescription.create({
-          data: {
-            patientId: doc.patientId,
-            documentId: doc.id,
-            medicationName: rx.medication_name,
-            dosage: rx.dosage || null,
-            frequency: rx.frequency || null,
-            route: rx.route || null,
-            duration: rx.duration || null,
-            prescribingDoctor: rx.prescribing_doctor || extractedData.physician_name || null,
-            origin: 'AI_EXTRACTED',
-            verificationStatus: 'NEEDS_REVIEW',
-          },
-        })
-      );
-      await Promise.all(rxPromises);
+      await prisma.prescription.createMany({
+        data: extractedData.prescriptions.map((rx) => ({
+          patientId: doc.patientId,
+          documentId: doc.id,
+          medicationName: rx.medication_name,
+          dosage: rx.dosage || null,
+          frequency: rx.frequency || null,
+          route: rx.route || null,
+          duration: rx.duration || null,
+          prescribingDoctor: rx.prescribing_doctor || extractedData.physician_name || null,
+          origin: 'AI_EXTRACTED',
+          verificationStatus: 'NEEDS_REVIEW',
+        })),
+      });
     }
 
     // Phase 6: Conflict Detection
     if (extractedData.detected_conflicts && extractedData.detected_conflicts.length > 0) {
-      const conflictPromises = extractedData.detected_conflicts.map((c) =>
-        prisma.conflict.create({
-          data: {
-            patientId: doc.patientId,
-            category: c.category,
-            title: c.title,
-            description: c.description,
-            sourceA: c.sourceA,
-            sourceB: c.sourceB,
-            status: 'UNRESOLVED',
-          },
-        })
-      );
-      await Promise.all(conflictPromises);
+      await prisma.conflict.createMany({
+        data: extractedData.detected_conflicts.map((c) => ({
+          patientId: doc.patientId,
+          category: c.category,
+          title: c.title,
+          description: c.description,
+          sourceA: c.sourceA,
+          sourceB: c.sourceB,
+          status: 'UNRESOLVED',
+        })),
+      });
     }
 
     // Phase 7: Safe AI Summary Generation

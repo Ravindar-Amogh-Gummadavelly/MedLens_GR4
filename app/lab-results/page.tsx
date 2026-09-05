@@ -3,24 +3,25 @@ import LabTrendsChart from '@/components/trends/LabTrendsChart';
 import LabResultsSearchContainer from './LabResultsSearchContainer';
 import { FlaskConical } from 'lucide-react';
 
-export const revalidate = 0;
+export const dynamic = 'force-dynamic';
 
 export default async function LabResultsPage() {
   const labResults = await prisma.labResult.findMany({
-    orderBy: { testDate: 'desc' },
-    include: { document: true },
+    orderBy: { createdAt: 'desc' },
+    include: { document: { select: { originalName: true } } },
+    take: 100,
   });
 
   const hemoglobinPoints = labResults
-    .filter((r) => r.testName.toLowerCase().includes('hemoglobin'))
+    .filter((r) => r.testName.toLowerCase().includes('hemoglobin') && r.valueNum != null)
     .map((r) => ({
-      date: r.testDate || '2026-08-15',
-      value: r.valueNum || parseFloat(r.valueText) || 12.1,
+      date: r.testDate || r.createdAt.toISOString().split('T')[0],
+      value: r.valueNum!,
       unit: r.unit || 'g/dL',
       status: r.deterministicStatus,
       lowerBound: r.lowerBound,
       upperBound: r.upperBound,
-      documentName: r.document.originalName,
+      documentName: r.document?.originalName || 'Medical Report',
     }));
 
   return (
@@ -54,7 +55,7 @@ export default async function LabResultsPage() {
           confidence: r.confidence,
           verificationStatus: r.verificationStatus,
           documentId: r.documentId,
-          documentName: r.document.originalName,
+          documentName: r.document?.originalName || 'Medical Report',
           testDate: r.testDate,
         }))}
       />

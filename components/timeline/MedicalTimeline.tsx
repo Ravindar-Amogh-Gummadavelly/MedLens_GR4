@@ -50,9 +50,7 @@ const DEFAULT_EVENTS: TimelineEventItem[] = [
   },
 ];
 
-export default function MedicalTimeline({ events = DEFAULT_EVENTS }: MedicalTimelineProps) {
-  const displayEvents = events.length > 0 ? events : DEFAULT_EVENTS;
-
+export default function MedicalTimeline({ events = [] }: MedicalTimelineProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div>
@@ -62,9 +60,26 @@ export default function MedicalTimeline({ events = DEFAULT_EVENTS }: MedicalTime
         </p>
       </div>
 
-      <div className="card p-6">
-        <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-clinical-border">
-          {displayEvents.map((event) => {
+      {events.length === 0 ? (
+        <div className="card p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl font-bold">
+            📜
+          </div>
+          <h3 className="text-lg font-bold text-text-primary">No Event Activity Logged</h3>
+          <p className="text-sm text-text-secondary max-w-md mx-auto">
+            Uploaded reports, verification actions, and conflict alerts will automatically appear here chronologically.
+          </p>
+          <a
+            href="/reports/upload"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            Upload Medical Report
+          </a>
+        </div>
+      ) : (
+        <div className="card p-6">
+          <div className="relative pl-6 space-y-6 before:absolute before:left-3 before:top-3 before:bottom-3 before:w-0.5 before:bg-clinical-border">
+            {events.map((event) => {
             const isUpload = event.eventType === 'DOCUMENT_UPLOADED' || event.eventType === 'LAB_REPORT_PROCESSED';
             const isVerification = event.eventType === 'VERIFICATION_ACTION';
             const isConflict = event.eventType === 'CONFLICT_DETECTED';
@@ -114,6 +129,7 @@ export default function MedicalTimeline({ events = DEFAULT_EVENTS }: MedicalTime
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }

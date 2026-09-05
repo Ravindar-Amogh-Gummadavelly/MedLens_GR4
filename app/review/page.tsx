@@ -1,5 +1,31 @@
-import VerificationCenter from '@/components/review/VerificationCenter';
+import { prisma } from '@/lib/prisma';
+import VerificationCenterContainer from './VerificationCenterContainer';
 
-export default function ReviewPage() {
-  return <VerificationCenter />;
+export const dynamic = 'force-dynamic';
+
+export default async function ReviewPage() {
+  const pendingResults = await prisma.labResult.findMany({
+    where: { verificationStatus: 'NEEDS_REVIEW' },
+    include: { document: { select: { originalName: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 50,
+  });
+
+  const reviewItems = pendingResults.map((r) => ({
+    id: r.id,
+    testName: r.testName,
+    category: r.category,
+    valueText: r.valueText,
+    unit: r.unit,
+    rawReferenceRange: r.rawReferenceRange,
+    deterministicStatus: (r.deterministicStatus || 'UNABLE_TO_DETERMINE') as any,
+    origin: r.origin,
+    confidence: Math.round(r.confidence || 95),
+    verificationStatus: r.verificationStatus,
+    sourceText: r.sourceText,
+    documentName: r.document?.originalName || 'Medical Report',
+    testDate: r.testDate,
+  }));
+
+  return <VerificationCenterContainer initialItems={reviewItems} />;
 }

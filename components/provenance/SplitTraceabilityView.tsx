@@ -23,86 +23,10 @@ export interface SplitTraceabilityProps {
 }
 
 /* ── Demo Data ─────────────────────────────────────────────────── */
-const DEFAULT_ITEMS = [
-  {
-    id: '1',
-    field: 'Hemoglobin',
-    value: '11.2 g/dL',
-    status: 'low',
-    origin: 'ai-extracted',
-    verification: 'needs-review',
-    confidence: 92,
-    sourceText: 'Hemoglobin: 11.2 g/dL',
-    sourceRegion: { page: 1, top: 320, left: 45, width: 200, height: 18 },
-    referenceRange: '13.0–17.0 g/dL',
-    extractedAt: '2025-09-01 14:23:05',
-    modelVersion: 'gemini-2.0-flash',
-    reviewNote: '',
-  },
-  {
-    id: '2',
-    field: 'Fasting Glucose',
-    value: '142 mg/dL',
-    status: 'high',
-    origin: 'ai-extracted',
-    verification: 'needs-review',
-    confidence: 97,
-    sourceText: 'Glucose (Fasting): 142 mg/dL',
-    sourceRegion: { page: 1, top: 352, left: 45, width: 220, height: 18 },
-    referenceRange: '70–100 mg/dL',
-    extractedAt: '2025-09-01 14:23:05',
-    modelVersion: 'gemini-2.0-flash',
-    reviewNote: '',
-  },
-  {
-    id: '3',
-    field: 'TSH',
-    value: '2.8 mIU/L',
-    status: 'normal',
-    origin: 'ai-extracted',
-    verification: 'verified',
-    confidence: 99,
-    sourceText: 'TSH (Thyroid Stimulating Hormone): 2.8 mIU/L',
-    sourceRegion: { page: 2, top: 105, left: 40, width: 310, height: 18 },
-    referenceRange: '0.4–4.0 mIU/L',
-    extractedAt: '2025-08-28 09:45:12',
-    modelVersion: 'gemini-2.0-flash',
-    reviewNote: 'Confirmed by Dr. Mehta on 2025-08-29',
-  },
-  {
-    id: '4',
-    field: 'Creatinine',
-    value: '1.1 mg/dL',
-    status: 'normal',
-    origin: 'ai-extracted',
-    verification: 'verified',
-    confidence: 95,
-    sourceText: 'Serum Creatinine: 1.1 mg/dL',
-    sourceRegion: { page: 2, top: 137, left: 40, width: 190, height: 18 },
-    referenceRange: '0.7–1.3 mg/dL',
-    extractedAt: '2025-08-28 09:45:12',
-    modelVersion: 'gemini-2.0-flash',
-    reviewNote: 'Confirmed by Dr. Mehta on 2025-08-29',
-  },
-  {
-    id: '5',
-    field: 'HbA1c',
-    value: '7.8%',
-    status: 'high',
-    origin: 'ai-extracted',
-    verification: 'rejected',
-    confidence: 78,
-    sourceText: 'HbA1c: 7.8%',
-    sourceRegion: { page: 1, top: 384, left: 45, width: 120, height: 18 },
-    referenceRange: '4.0–5.6%',
-    extractedAt: '2025-08-25 16:10:33',
-    modelVersion: 'gemini-2.0-flash',
-    reviewNote: 'OCR misread decimal — confirmed value is 6.8%. Corrected manually.',
-  },
-];
+const DEFAULT_ITEMS: any[] = [];
 
 export default function SplitTraceabilityView({
-  documentName = 'CBC_Report_Sep2025.pdf',
+  documentName = 'Medical Document',
   rawOcrText,
   labResults,
 }: SplitTraceabilityProps) {
@@ -111,20 +35,20 @@ export default function SplitTraceabilityView({
         id: r.id,
         field: r.testName,
         value: `${r.valueText} ${r.unit || ''}`.trim(),
-        status: r.deterministicStatus.toLowerCase(),
-        origin: r.origin.toLowerCase().includes('ai') ? 'ai-extracted' : 'user-provided',
-        verification: r.verificationStatus.toLowerCase().replace('_', '-'),
+        status: (r.deterministicStatus || 'UNABLE_TO_DETERMINE').toLowerCase(),
+        origin: (r.origin || '').toLowerCase().includes('ai') ? 'ai-extracted' : 'user-provided',
+        verification: (r.verificationStatus || '').toLowerCase().replace('_', '-'),
         confidence: r.confidence || 90,
         sourceText: r.sourceText || `${r.testName}: ${r.valueText} ${r.unit || ''}`,
         sourceRegion: { page: r.sourcePage || 1, top: 200, left: 40, width: 200, height: 18 },
         referenceRange: r.rawReferenceRange || 'N/A',
-        extractedAt: r.testDate || '2025-09-01',
-        modelVersion: 'gemini-2.0-flash',
+        extractedAt: r.testDate || 'Recent',
+        modelVersion: 'gemini-1.5-flash',
         reviewNote: '',
       }))
-    : DEFAULT_ITEMS;
+    : [];
 
-  const [selectedId, setSelectedId] = useState(items[0].id);
+  const [selectedId, setSelectedId] = useState(items[0]?.id || '');
   const selected = items.find((i) => i.id === selectedId) || items[0];
 
   return (
@@ -137,8 +61,24 @@ export default function SplitTraceabilityView({
         </p>
       </div>
 
-      {/* Split pane */}
-      <div className="grid grid-cols-5 gap-0 card overflow-hidden" style={{ minHeight: '600px' }}>
+      {items.length === 0 ? (
+        <div className="card p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl font-bold">
+            🔍
+          </div>
+          <h3 className="text-lg font-bold text-text-primary">No Document Traceability Data</h3>
+          <p className="text-sm text-text-secondary max-w-md mx-auto">
+            Upload a medical report to inspect source document text highlights and structured field mappings.
+          </p>
+          <a
+            href="/reports/upload"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            Upload Medical Report
+          </a>
+        </div>
+      ) : (
+        <div className="grid grid-cols-5 gap-0 card overflow-hidden" style={{ minHeight: '600px' }}>
         {/* Left panel — Item list */}
         <div className="col-span-2 border-r border-clinical-border flex flex-col">
           <div className="px-4 py-3 border-b border-clinical-border bg-clinical-subtle">
@@ -248,6 +188,7 @@ export default function SplitTraceabilityView({
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

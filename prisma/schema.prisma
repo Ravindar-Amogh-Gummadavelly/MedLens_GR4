@@ -39,6 +39,8 @@ model Patient {
   summaries          Summary[]
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+
+  @@index([userId])
 }
 
 model MedicalDocument {
@@ -60,6 +62,9 @@ model MedicalDocument {
   summaries      Summary[]
   uploadedAt     DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
+
+  @@index([patientId])
+  @@index([status])
 }
 
 model ExtractionJob {
@@ -70,6 +75,8 @@ model ExtractionJob {
   error       String?
   startedAt   DateTime        @default(now())
   completedAt DateTime?
+
+  @@index([documentId])
 }
 
 model LabResult {
@@ -97,6 +104,12 @@ model LabResult {
   testDate            String?
   createdAt           DateTime       @default(now())
   updatedAt           DateTime       @updatedAt
+
+  @@index([patientId])
+  @@index([documentId])
+  @@index([verificationStatus])
+  @@index([testName])
+  @@index([deterministicStatus])
 }
 
 model Prescription {
@@ -116,6 +129,8 @@ model Prescription {
   verifications      Verification[]
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
+
+  @@index([patientId])
 }
 
 model TimelineEvent {
@@ -130,6 +145,9 @@ model TimelineEvent {
   eventDate   DateTime         @default(now())
   metadata    String?
   createdAt   DateTime         @default(now())
+
+  @@index([patientId])
+  @@index([eventDate])
 }
 
 model Verification {
@@ -145,6 +163,8 @@ model Verification {
   action           String        // VERIFIED, EDITED, REJECTED
   reason           String?
   createdAt        DateTime      @default(now())
+
+  @@index([labResultId])
 }
 
 model Conflict {
@@ -160,6 +180,9 @@ model Conflict {
   resolvedByUserId String?
   resolution      String?
   createdAt       DateTime @default(now())
+
+  @@index([patientId])
+  @@index([status])
 }
 
 model Summary {
@@ -173,6 +196,8 @@ model Summary {
   factualPoints String
   safeNotes    String?
   createdAt    DateTime        @default(now())
+
+  @@index([patientId])
 }
 
 model AuditEvent {
@@ -184,4 +209,6 @@ model AuditEvent {
   targetId   String
   details    String?
   createdAt  DateTime @default(now())
+
+  @@index([userId])
 }

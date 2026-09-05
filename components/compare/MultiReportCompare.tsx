@@ -22,21 +22,10 @@ interface MultiReportCompareProps {
   comparisonData?: ComparisonRow[];
 }
 
-const DEFAULT_REPORT_A = { name: 'CBC_Jul2025.pdf', date: '2025-07-20' };
-const DEFAULT_REPORT_B = { name: 'CBC_Report_Sep2025.pdf', date: '2025-09-01' };
-
-const DEFAULT_DATA: ComparisonRow[] = [
-  { testName: 'Hemoglobin', category: 'Hematology', previousValueText: '12.4', previousValueNum: 12.4, previousDate: '2025-07-20', currentValueText: '11.2', currentValueNum: 11.2, currentDate: '2025-09-01', unit: 'g/dL', previousStatus: 'low', currentStatus: 'low' },
-  { testName: 'Fasting Glucose', category: 'Metabolic', previousValueText: '110', previousValueNum: 110, previousDate: '2025-07-20', currentValueText: '142', currentValueNum: 142, currentDate: '2025-09-01', unit: 'mg/dL', previousStatus: 'high', currentStatus: 'high' },
-  { testName: 'WBC Count', category: 'Hematology', previousValueText: '6,800', previousValueNum: 6800, previousDate: '2025-07-20', currentValueText: '7,200', currentValueNum: 7200, currentDate: '2025-09-01', unit: '/µL', previousStatus: 'normal', currentStatus: 'normal' },
-  { testName: 'Platelet Count', category: 'Hematology', previousValueText: '250,000', previousValueNum: 250000, previousDate: '2025-07-20', currentValueText: '245,000', currentValueNum: 245000, currentDate: '2025-09-01', unit: '/µL', previousStatus: 'normal', currentStatus: 'normal' },
-  { testName: 'Serum Creatinine', category: 'Renal', previousValueText: '1.0', previousValueNum: 1.0, previousDate: '2025-07-20', currentValueText: '1.1', currentValueNum: 1.1, currentDate: '2025-09-01', unit: 'mg/dL', previousStatus: 'normal', currentStatus: 'normal' },
-];
-
 export default function MultiReportCompare({
-  reportA = DEFAULT_REPORT_A,
-  reportB = DEFAULT_REPORT_B,
-  comparisonData = DEFAULT_DATA,
+  reportA,
+  reportB,
+  comparisonData = [],
 }: MultiReportCompareProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -47,26 +36,46 @@ export default function MultiReportCompare({
             Side-by-side delta analysis between historical and baseline lab reports.
           </p>
         </div>
-        <div className="flex items-center gap-3 text-xs bg-clinical-subtle border border-clinical-border px-3 py-2 rounded-lg font-mono">
-          <div>
-            <span className="text-text-muted text-2xs uppercase tracking-wider block">Baseline</span>
-            <span className="font-medium text-text-primary">{reportA.name} ({reportA.date})</span>
+        {reportA && reportB && (
+          <div className="flex items-center gap-3 text-xs bg-clinical-subtle border border-clinical-border px-3 py-2 rounded-lg font-mono">
+            <div>
+              <span className="text-text-muted text-2xs uppercase tracking-wider block">Baseline</span>
+              <span className="font-medium text-text-primary">{reportA.name} ({reportA.date})</span>
+            </div>
+            <span className="text-text-muted">→</span>
+            <div>
+              <span className="text-text-muted text-2xs uppercase tracking-wider block">Current</span>
+              <span className="font-semibold text-primary-700">{reportB.name} ({reportB.date})</span>
+            </div>
           </div>
-          <span className="text-text-muted">→</span>
-          <div>
-            <span className="text-text-muted text-2xs uppercase tracking-wider block">Current</span>
-            <span className="font-semibold text-primary-700">{reportB.name} ({reportB.date})</span>
-          </div>
-        </div>
+        )}
       </div>
+
+      {comparisonData.length === 0 ? (
+        <div className="card p-12 text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl font-bold">
+            ⚖️
+          </div>
+          <h3 className="text-lg font-bold text-text-primary">No Comparison Reports Available</h3>
+          <p className="text-sm text-text-secondary max-w-md mx-auto">
+            Upload at least two medical lab reports to compare parameter deltas side-by-side.
+          </p>
+          <a
+            href="/reports/upload"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            Upload Medical Report
+          </a>
+        </div>
+      ) : (
 
       <div className="card overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-clinical-subtle text-text-tertiary text-xs font-medium uppercase tracking-wider border-b border-clinical-border">
               <th className="text-left px-5 py-3">Parameter</th>
-              <th className="text-right px-5 py-3">Previous ({reportA.date})</th>
-              <th className="text-right px-5 py-3">Current ({reportB.date})</th>
+              <th className="text-right px-5 py-3">Previous ({reportA?.date || 'N/A'})</th>
+              <th className="text-right px-5 py-3">Current ({reportB?.date || 'N/A'})</th>
               <th className="text-center px-5 py-3">Absolute Delta</th>
               <th className="text-center px-5 py-3">Current Status</th>
             </tr>
@@ -114,6 +123,7 @@ export default function MultiReportCompare({
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }
