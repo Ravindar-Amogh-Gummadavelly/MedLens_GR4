@@ -1,7 +1,12 @@
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import VerificationCenterContainer from './VerificationCenterContainer';
 
 export const dynamic = 'force-dynamic';
+
+type LabResultWithDoc = Prisma.LabResultGetPayload<{
+  include: { document: { select: { originalName: true } } };
+}>;
 
 export default async function ReviewPage() {
   const pendingResults = await prisma.labResult.findMany({
@@ -11,7 +16,7 @@ export default async function ReviewPage() {
     take: 50,
   });
 
-  const reviewItems = pendingResults.map((r) => ({
+  const reviewItems = pendingResults.map((r: LabResultWithDoc) => ({
     id: r.id,
     testName: r.testName,
     category: r.category,
