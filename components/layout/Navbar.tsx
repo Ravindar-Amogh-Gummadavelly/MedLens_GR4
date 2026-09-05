@@ -38,7 +38,7 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3 pl-3 border-l border-slate-800">
-          <div className="w-8 h-8 rounded-full bg-clinical-navy/80 border border-slate-700 flex items-center justify-center text-white font-bold text-xs">
+          <div className="w-8 h-8 rounded-full bg-primary-700 border border-slate-700 flex items-center justify-center text-white font-bold text-xs">
             SJ
           </div>
           <div className="text-left hidden sm:block">

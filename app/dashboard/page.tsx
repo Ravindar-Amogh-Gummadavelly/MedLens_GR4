@@ -26,25 +26,25 @@ export default async function DashboardPage() {
   if (!patient) {
     return (
       <div className="max-w-4xl mx-auto py-12 px-6 text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-clinical-navy/10 border border-clinical-navy/20 flex items-center justify-center mx-auto text-clinical-navy text-2xl font-bold">
+        <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-950/50 border border-primary-200 dark:border-primary-800 flex items-center justify-center mx-auto text-primary-600 text-2xl font-bold">
           🛡️
         </div>
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Clinical Information Intelligence Workspace</h1>
-          <p className="text-sm text-slate-600 max-w-lg mx-auto">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Clinical Information Intelligence Workspace</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
             No patient profile currently active. Initialize a new patient record or upload a medical document to analyze structured lab parameters and provenance.
           </p>
         </div>
         <div className="flex items-center justify-center gap-4 pt-2">
           <a
             href="/patients/new"
-            className="px-5 py-2.5 bg-clinical-navy text-white text-sm font-semibold rounded-lg shadow-sm hover:bg-slate-800 transition-all"
+            className="px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-all"
           >
             + Create New Patient Profile
           </a>
           <a
             href="/reports/upload"
-            className="px-5 py-2.5 bg-white text-slate-700 border border-slate-300 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-all"
+            className="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-sm font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
           >
             📄 Upload Medical Report
           </a>

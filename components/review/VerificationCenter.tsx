@@ -82,7 +82,7 @@ export default function VerificationCenter({
 
       {items.length === 0 ? (
         <div className="card p-12 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-primary-600 text-xl">
             ✓
           </div>
           <h3 className="text-lg font-bold text-text-primary">No Pending Verification Items</h3>
@@ -91,7 +91,7 @@ export default function VerificationCenter({
           </p>
           <a
             href="/reports/upload"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
           >
             Upload Medical Document
           </a>

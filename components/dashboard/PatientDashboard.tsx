@@ -99,11 +99,11 @@ export default function PatientDashboard({
       {/* Page header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-text-primary tracking-tight">Patient Dashboard</h1>
+          <h1 className="text-2xl font-bold text-text-primary dark:text-white tracking-tight">Patient Dashboard</h1>
           <div className="flex items-center gap-3 mt-1.5">
             <span className="text-sm text-text-secondary font-medium">{pName}</span>
             <span className="text-xs text-text-muted bg-clinical-muted px-2 py-0.5 rounded-md font-mono">{pId}</span>
-            <span className="text-xs text-text-tertiary">45y / Male</span>
+            <span className="text-xs text-text-tertiary dark:text-slate-400">{patient?.dob || 'N/A'} / {patient?.sex || 'N/A'}</span>
           </div>
         </div>
         <Link
@@ -131,9 +131,9 @@ export default function PatientDashboard({
               <h2 className="text-lg font-bold tracking-tight">{pName}</h2>
               <p className="text-2xs text-primary-200 font-mono">MR-{pId}</p>
               <div className="flex items-center gap-2 text-2xs text-primary-100 mt-0.5">
-                <span>34 Years</span>
+                <span>DOB: {patient?.dob || 'N/A'}</span>
                 <span>•</span>
-                <span>Male</span>
+                <span>{patient?.sex || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function PatientDashboard({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-clinical-subtle text-text-tertiary text-xs font-medium uppercase tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-800/60 text-text-tertiary dark:text-slate-400 text-xs font-medium uppercase tracking-wider">
                   <th className="text-left px-5 py-2.5">Test</th>
                   <th className="text-right px-5 py-2.5">Value</th>
                   <th className="text-left px-5 py-2.5">Ref. Range</th>
@@ -219,7 +219,7 @@ export default function PatientDashboard({
               </thead>
               <tbody className="divide-y divide-clinical-border">
                 {displayResults.map((r, i) => (
-                  <tr key={i} className="hover:bg-clinical-subtle transition-colors">
+                  <tr key={i} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="px-5 py-3 font-medium text-text-primary">{r.test}</td>
                     <td className="px-5 py-3 text-right font-mono font-semibold text-text-primary">
                       {r.value}
@@ -250,7 +250,7 @@ export default function PatientDashboard({
           </div>
           <div className="divide-y divide-clinical-border">
             {displayUploads.map((u, i) => (
-              <div key={i} className="px-5 py-3.5 hover:bg-clinical-subtle transition-colors">
+              <div key={i} className="px-5 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                 <div className="flex items-start justify-between mb-1">
                   <span className="text-sm font-medium text-text-primary truncate max-w-[180px]">{u.name}</span>
                   <span className={`text-2xs font-semibold px-1.5 py-0.5 rounded ${
@@ -273,15 +273,15 @@ export default function PatientDashboard({
       </div>
 
       {/* Safety Disclosure */}
-      <div className="flex items-start gap-3 px-4 py-3 bg-primary-50 border border-primary-200 rounded-xl text-sm">
+      <div className="flex items-start gap-3 px-4 py-3 bg-primary-50 dark:bg-primary-950/80 border border-primary-200 dark:border-primary-800 rounded-xl text-sm">
         <svg className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="12" cy="12" r="10"/>
           <line x1="12" y1="16" x2="12" y2="12"/>
           <line x1="12" y1="8" x2="12.01" y2="8"/>
         </svg>
         <div>
-          <p className="font-medium text-primary-800">Safety Notice</p>
-          <p className="text-primary-700 mt-0.5 text-xs leading-relaxed">
+          <p className="font-medium text-primary-800 dark:text-primary-300">Safety Notice</p>
+          <p className="text-primary-700 dark:text-primary-400 mt-0.5 text-xs leading-relaxed">
             Lab statuses are computed using deterministic reference range logic. AI extracts data from documents — 
             it does <strong>not</strong> determine clinical significance. All AI-extracted values must be verified by a qualified professional.
           </p>

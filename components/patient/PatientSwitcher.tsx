@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 interface Patient {
@@ -20,6 +20,21 @@ export default function PatientSwitcher() {
   const [isOpen, setIsOpen] = useState(false);
 
   const [searchQuery, setSearchQuery] = useState('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Click-outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+        setSearchQuery('');
+      }
+    }
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
 
   useEffect(() => {
     fetchPatients();
@@ -58,12 +73,12 @@ export default function PatientSwitcher() {
   });
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left" ref={containerRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-clinical-border dark:border-slate-800 bg-clinical-surface dark:bg-slate-900 hover:bg-clinical-muted dark:hover:bg-slate-800 transition-all text-left shadow-xs"
+        className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg border border-clinical-border dark:border-slate-800 bg-clinical-surface dark:bg-slate-900 hover:bg-clinical-muted dark:hover:bg-slate-800 transition-all text-left shadow-sm"
       >
-        <div className="w-7 h-7 rounded-full bg-clinical-navy text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-xs">
+        <div className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0 shadow-sm">
           {selectedPatient ? selectedPatient.name.charAt(0).toUpperCase() : 'P'}
         </div>
         <div className="min-w-0 pr-1">

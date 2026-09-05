@@ -62,7 +62,7 @@ export default function MedicalTimeline({ events = [] }: MedicalTimelineProps) {
 
       {events.length === 0 ? (
         <div className="card p-12 text-center space-y-4">
-          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-clinical-navy text-xl font-bold">
+          <div className="w-12 h-12 rounded-full bg-clinical-muted flex items-center justify-center mx-auto text-primary-600 text-xl font-bold">
             📜
           </div>
           <h3 className="text-lg font-bold text-text-primary">No Event Activity Logged</h3>
@@ -71,7 +71,7 @@ export default function MedicalTimeline({ events = [] }: MedicalTimelineProps) {
           </p>
           <a
             href="/reports/upload"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
           >
             Upload Medical Report
           </a>

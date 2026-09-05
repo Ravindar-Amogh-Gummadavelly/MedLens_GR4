@@ -72,7 +72,7 @@ export default function PatientDirectoryClient({ patients }: PatientDirectoryCli
               <div className="space-y-2">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-full bg-clinical-navy text-white font-bold text-sm flex items-center justify-center shadow-xs">
+                    <div className="w-10 h-10 rounded-full bg-primary-600 text-white font-bold text-sm flex items-center justify-center shadow-sm">
                       {p.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
