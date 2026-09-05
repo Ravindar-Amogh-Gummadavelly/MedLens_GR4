@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import Sidebar from '@/components/layout/Sidebar';
-import TopBar from '@/components/layout/TopBar';
+import LayoutShell from '@/components/layout/LayoutShell';
 
 export const metadata: Metadata = {
   title: 'MedLens — AI-Powered Clinical Information Intelligence',
@@ -15,12 +14,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <Sidebar />
-        <div className="ml-60 min-h-screen flex flex-col">
-          <TopBar />
-          <main className="flex-1 p-6 overflow-y-auto">{children}</main>
-        </div>
+      <body className="bg-clinical-bg antialiased">
+        <LayoutShell>{children}</LayoutShell>
       </body>
     </html>
   );
