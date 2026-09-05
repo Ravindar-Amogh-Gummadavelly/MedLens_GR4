@@ -1,56 +1,64 @@
+import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
-import DoctorReadyPDF from '@/components/export/DoctorReadyPDF';
+import { Users, UserPlus } from 'lucide-react';
+import PatientDirectoryClient from '@/components/patient/PatientDirectoryClient';
 
 export const revalidate = 0;
 
-export default async function PatientRecordPage() {
-  const patient = await prisma.patient.findFirst({
+export default async function PatientDirectoryPage() {
+  const patients = await prisma.patient.findMany({
+    orderBy: { createdAt: 'desc' },
     include: {
-      labResults: { orderBy: { testDate: 'desc' } },
-      summaries: { orderBy: { createdAt: 'desc' }, take: 1 },
+      _count: {
+        select: {
+          labResults: true,
+          documents: true,
+        },
+      },
+      labResults: {
+        select: { deterministicStatus: true, verificationStatus: true },
+      },
     },
   });
 
-  if (!patient) {
-    return (
-      <div className="max-w-3xl mx-auto py-16 text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-800">No Patient Record Selected</h2>
-        <p className="text-sm text-slate-500">Create a patient profile to view printable clinical records and summaries.</p>
-        <a
-          href="/patients/new"
-          className="inline-block px-4 py-2 bg-clinical-navy text-white text-sm font-semibold rounded-lg hover:bg-slate-800 transition-colors"
-        >
-          + Create Patient Record
-        </a>
-      </div>
-    );
-  }
-
-  const latestSummary = patient.summaries[0]?.summaryText || null;
+  const formattedPatients = patients.map((p) => ({
+    id: p.id,
+    name: p.name,
+    dob: p.dob,
+    sex: p.sex,
+    symptoms: p.symptoms,
+    allergies: p.allergies,
+    totalTests: p._count.labResults,
+    totalDocs: p._count.documents,
+    flaggedCount: p.labResults.filter(
+      (r) => r.deterministicStatus === 'HIGH' || r.deterministicStatus === 'LOW'
+    ).length,
+  }));
 
   return (
-    <DoctorReadyPDF
-      patient={{
-        name: patient.name,
-        dob: patient.dob,
-        sex: patient.sex,
-        symptoms: patient.symptoms,
-        existingConditions: patient.existingConditions,
-        allergies: patient.allergies,
-      }}
-      labResults={patient.labResults.map((r) => ({
-        testName: r.testName,
-        category: r.category,
-        valueText: r.valueText,
-        unit: r.unit,
-        rawReferenceRange: r.rawReferenceRange,
-        deterministicStatus: r.deterministicStatus,
-        origin: r.origin,
-        verificationStatus: r.verificationStatus,
-        sourcePage: r.sourcePage,
-        testDate: r.testDate,
-      }))}
-      summaryText={latestSummary}
-    />
+    <div className="max-w-6xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between bg-clinical-surface dark:bg-slate-900 p-6 rounded-2xl border border-clinical-border dark:border-slate-800">
+        <div>
+          <h1 className="text-xl font-bold text-text-primary dark:text-white flex items-center gap-2">
+            <Users className="w-5 h-5 text-primary-600" />
+            Patient Directory & Clinical Records
+          </h1>
+          <p className="text-xs text-text-tertiary dark:text-slate-400 mt-1">
+            Search and manage patient records by name or medical identification number.
+          </p>
+        </div>
+        <Link
+          href="/patients/new"
+          className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-1.5"
+        >
+          <UserPlus className="w-4 h-4" />
+          + Create New Patient
+        </Link>
+      </div>
+
+      {/* Directory Grid with Search */}
+      <PatientDirectoryClient patients={formattedPatients} />
+    </div>
   );
 }

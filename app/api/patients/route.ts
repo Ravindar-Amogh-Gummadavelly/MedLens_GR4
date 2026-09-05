@@ -1,6 +1,49 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+export async function GET() {
+  try {
+    const patients = await prisma.patient.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: {
+        _count: {
+          select: {
+            labResults: true,
+            documents: true,
+          },
+        },
+        labResults: {
+          select: { deterministicStatus: true, verificationStatus: true },
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      patients: patients.map((p) => ({
+        id: p.id,
+        name: p.name,
+        dob: p.dob,
+        sex: p.sex,
+        symptoms: p.symptoms,
+        existingConditions: p.existingConditions,
+        allergies: p.allergies,
+        medications: p.medications,
+        totalTests: p._count.labResults,
+        totalDocs: p._count.documents,
+        flaggedTests: p.labResults.filter(
+          (r) => r.deterministicStatus === 'HIGH' || r.deterministicStatus === 'LOW'
+        ).length,
+        verifiedTests: p.labResults.filter((r) => r.verificationStatus === 'VERIFIED').length,
+        createdAt: p.createdAt.toISOString(),
+      })),
+    });
+  } catch (err: any) {
+    console.error('Fetch patients error:', err);
+    return NextResponse.json({ error: err.message || 'Failed to fetch patients' }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();

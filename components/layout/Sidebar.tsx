@@ -39,9 +39,9 @@ export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed top-0 left-0 z-40 h-screen w-60 bg-clinical-surface border-r border-clinical-border shadow-sidebar flex flex-col">
+    <aside className="fixed top-0 left-0 z-40 h-screen w-60 bg-clinical-surface dark:bg-slate-900 border-r border-clinical-border dark:border-slate-800 shadow-sidebar flex flex-col transition-colors duration-200">
       {/* Logo / Brand */}
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-clinical-border">
+      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-clinical-border dark:border-slate-800">
         <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-sm">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -50,8 +50,8 @@ export default function Sidebar() {
           </svg>
         </div>
         <div>
-          <span className="text-base font-bold text-text-primary tracking-tight">MedLens</span>
-          <span className="block text-2xs text-text-tertiary font-medium -mt-0.5">Clinical Intelligence</span>
+          <span className="text-base font-bold text-text-primary dark:text-slate-100 tracking-tight">MedLens</span>
+          <span className="block text-2xs text-text-tertiary dark:text-slate-400 font-medium -mt-0.5">Clinical Intelligence</span>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export default function Sidebar() {
       <nav className="flex-1 overflow-y-auto py-3 px-3">
         {NAV_SECTIONS.map((section) => (
           <div key={section.label} className="mb-4">
-            <span className="px-2 text-2xs font-semibold text-text-muted uppercase tracking-widest">
+            <span className="px-2 text-2xs font-semibold text-text-muted dark:text-slate-500 uppercase tracking-widest">
               {section.label}
             </span>
             <ul className="mt-1.5 space-y-0.5">
@@ -72,8 +72,8 @@ export default function Sidebar() {
                       href={item.href}
                       className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-100 group ${
                         isActive
-                          ? 'bg-primary-50 text-primary-700 shadow-sm'
-                          : 'text-text-secondary hover:text-text-primary hover:bg-clinical-muted'
+                          ? 'bg-primary-50 dark:bg-primary-950/80 text-primary-700 dark:text-primary-300 shadow-sm border border-primary-200 dark:border-primary-800'
+                          : 'text-text-secondary dark:text-slate-300 hover:text-text-primary dark:hover:text-white hover:bg-clinical-muted dark:hover:bg-slate-800'
                       }`}
                     >
                       <item.icon active={isActive} />
@@ -87,11 +87,37 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
-      <div className="px-4 py-3 border-t border-clinical-border">
-        <div className="flex items-center gap-2 text-2xs text-text-muted">
+      {/* Footer / User Profile & Logout */}
+      <div className="px-3 py-3 border-t border-clinical-border dark:border-slate-800 space-y-2 bg-clinical-subtle/50 dark:bg-slate-900/50">
+        <div className="flex items-center justify-between p-2 rounded-lg bg-clinical-surface dark:bg-slate-800 border border-clinical-border dark:border-slate-700">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-7 h-7 rounded-full bg-primary-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+              SJ
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className="text-xs font-semibold text-text-primary dark:text-slate-100 block truncate leading-tight">Dr. Sarah Jenkins</span>
+              <span className="text-2xs text-text-tertiary dark:text-slate-400 block truncate font-mono">admin@medlens.org</span>
+            </div>
+          </div>
+          <button
+            onClick={async () => {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }}
+            title="Sign Out"
+            className="p-1 text-text-tertiary dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 rounded transition-colors"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2 px-2 text-2xs text-text-muted dark:text-slate-500">
           <div className="w-2 h-2 rounded-full bg-status-normal animate-pulse" />
-          <span>AI Engine: Gemini 2.0 Flash</span>
+          <span>AI Engine: Gemini 1.5/2.0 Flash Active</span>
         </div>
       </div>
     </aside>
