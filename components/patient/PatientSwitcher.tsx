@@ -31,13 +31,22 @@ export default function PatientSwitcher() {
       const data = await res.json();
       if (data.patients && data.patients.length > 0) {
         setPatients(data.patients);
-        setSelectedPatientId(data.patients[0].id);
+        const savedId = localStorage.getItem('medlens_active_patient');
+        const defaultId = savedId && data.patients.some((p: Patient) => p.id === savedId) ? savedId : data.patients[0].id;
+        setSelectedPatientId(defaultId);
       }
     } catch (err) {
       console.error('Failed to load patient records', err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSelectPatient = (id: string) => {
+    setSelectedPatientId(id);
+    localStorage.setItem('medlens_active_patient', id);
+    window.dispatchEvent(new Event('patientChanged'));
+    setIsOpen(false);
   };
 
   const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
@@ -106,10 +115,7 @@ export default function PatientSwitcher() {
                 return (
                   <button
                     key={p.id}
-                    onClick={() => {
-                      setSelectedPatientId(p.id);
-                      setIsOpen(false);
-                    }}
+                    onClick={() => handleSelectPatient(p.id)}
                     className={`w-full p-3 text-left transition-all flex items-center justify-between ${
                       isSelected
                         ? 'bg-primary-50/70 dark:bg-primary-950/60 border-l-4 border-primary-600'
